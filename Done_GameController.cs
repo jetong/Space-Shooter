@@ -12,27 +12,27 @@ public class Done_GameController : MonoBehaviour
 	public float waveWait;
 	public bool levelComplete;
 	public float fadeSceneTime;
-		
+	public bool gameOver;
+
 	public GUIText scoreText;
 	public GUIText restartText;
 	public GUIText gameOverText;
 	public GUIText nextLevelText;
-
-	private bool gameOver;
-	private bool restart;
+	
 	private int score;
 	private int level;
 	private float timer;
+	private Done_PlayerController playerController;
 
 	void Start ()
 	{
 		GetComponent<SceneFadeInOut> ().StartScene ();
 		gameOver = false;
-		restart = false;
 		levelComplete = false;
 		restartText.text = "";
 		nextLevelText.text = "";
 		gameOverText.text = "";
+		playerController = GameObject.FindGameObjectWithTag ("Player").GetComponent<Done_PlayerController>();
 
 		if (Application.loadedLevelName == "Scene1") {
 			level = 1;
@@ -42,9 +42,7 @@ public class Done_GameController : MonoBehaviour
 		{
 			level = PlayerPrefs.GetInt ("savedLevel");
 			score = PlayerPrefs.GetInt ("savedScore");
-
-			Done_PlayerController playerController = GameObject.FindGameObjectWithTag ("Player").GetComponent<Done_PlayerController>();
-			playerController.playerHealth = PlayerPrefs.GetInt ("savedHealth");
+			playerController.playerHealth = PlayerPrefs.GetFloat ("savedHealth");
 		}
 
 		UpdateScore ();
@@ -54,7 +52,7 @@ public class Done_GameController : MonoBehaviour
 	
 	void Update ()
 	{
-		if(levelComplete)
+		if(levelComplete && !gameOver) // don't advance level when player dies just as boss dies
 		{
 			GetComponent<SceneFadeInOut>().EndScene ();
 
@@ -62,12 +60,14 @@ public class Done_GameController : MonoBehaviour
 			{
 				level++;
 				PlayerPrefs.SetInt ("savedLevel", level);
-				Application.LoadLevel (level);
+				PlayerPrefs.SetFloat ("savedHealth", playerController.playerHealth);
+				Application.LoadLevel (level-1);
 			}
 		}
-		
-		if (restart)
+
+		if (gameOver)
 		{
+			restartText.text = "Press 'R' for Restart";
 			if (Input.GetKeyDown (KeyCode.R))
 			{
 				Application.LoadLevel ("Scene1");
@@ -78,33 +78,20 @@ public class Done_GameController : MonoBehaviour
 	IEnumerator SpawnWaves ()
 	{
 		yield return new WaitForSeconds (startWait);
-		while (true)
+
+		for (int i = 0; i < hazardCount; i++)
 		{
-			for (int i = 0; i < hazardCount; i++)
-			{
-				GameObject hazard = hazards [Random.Range (0, hazards.Length)];
-				Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
-				Quaternion spawnRotation = Quaternion.identity;
-				Instantiate (hazard, spawnPosition, spawnRotation);
-				yield return new WaitForSeconds (spawnWait);
-			}
-			yield return new WaitForSeconds (waveWait);
-
-			Instantiate (boss, new Vector3 (0.0f, spawnValues.y, spawnValues.z), Quaternion.identity);
-
-			yield return new WaitForSeconds (waveWait);
-			yield return new WaitForSeconds (waveWait);
-			yield return new WaitForSeconds (waveWait);
-
-			if (gameOver)
-			{
-				restartText.text = "Press 'R' for Restart";
-				restart = true;
-				break;
-			}
+			GameObject hazard = hazards [Random.Range (0, hazards.Length)];
+			Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+			Quaternion spawnRotation = Quaternion.identity;
+			Instantiate (hazard, spawnPosition, spawnRotation);
+			yield return new WaitForSeconds (spawnWait);
 		}
+		yield return new WaitForSeconds (waveWait);
+
+		Instantiate (boss, new Vector3 (0.0f, spawnValues.y, spawnValues.z), Quaternion.identity);
 	}
-	
+
 	public void AddScore (int newScoreValue)
 	{
 		score += newScoreValue;
