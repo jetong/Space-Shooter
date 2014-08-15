@@ -18,7 +18,9 @@ public class Done_GameController : MonoBehaviour
 	public GUIText restartText;
 	public GUIText gameOverText;
 	public GUIText nextLevelText;
-	
+	public GUIText healthText;
+
+	//private float health;
 	private int score;
 	private int level;
 	private float timer;
@@ -32,20 +34,24 @@ public class Done_GameController : MonoBehaviour
 		restartText.text = "";
 		nextLevelText.text = "";
 		gameOverText.text = "";
+		healthText.text = "";
 		playerController = GameObject.FindGameObjectWithTag ("Player").GetComponent<Done_PlayerController>();
 
 		if (Application.loadedLevelName == "Scene1") {
 			level = 1;
 			score = 0;
+			//health = 3;
 		} 
 		else 
 		{
 			level = PlayerPrefs.GetInt ("savedLevel");
 			score = PlayerPrefs.GetInt ("savedScore");
 			playerController.playerHealth = PlayerPrefs.GetFloat ("savedHealth");
+			//health = PlayerPrefs.GetFloat ("savedHealth");
 		}
 
 		UpdateScore ();
+		UpdateHealth ();
 		StartCoroutine (NextLevelDisplay ());
 		StartCoroutine (SpawnWaves ());
 	}
@@ -102,6 +108,11 @@ public class Done_GameController : MonoBehaviour
 	void UpdateScore ()
 	{
 		scoreText.text = "Score: " + score;
+	}
+
+	public void UpdateHealth()
+	{
+		healthText.text = "Health: " + playerController.playerHealth;
 	}
 
 	IEnumerator NextLevelDisplay ()

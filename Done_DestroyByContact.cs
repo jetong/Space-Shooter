@@ -7,7 +7,7 @@ public class Done_DestroyByContact : MonoBehaviour
 	public GameObject playerExplosion;
 	public GameObject boltExplosion;
 	public int scoreValue;
-	public float health;
+	public float enemyHealth;
 
 	private float dmg;
 	private Done_GameController gameController;
@@ -48,6 +48,7 @@ public class Done_DestroyByContact : MonoBehaviour
 
 			GameObject player = GameObject.FindGameObjectWithTag ("Player");
 			player.GetComponent <Done_PlayerController>().playerHealth -= dmg;
+			gameController.UpdateHealth();
 
 			if(player.GetComponent <Done_PlayerController>().playerHealth <= 0)
 			{
@@ -76,9 +77,9 @@ public class Done_DestroyByContact : MonoBehaviour
 			Destroy (gameObject);
 
 			GameObject asteroid = GameObject.FindGameObjectWithTag ("Asteroid");
-			asteroid.GetComponent <Done_DestroyByContact>().health -= dmg;
+			asteroid.GetComponent <Done_DestroyByContact>().enemyHealth -= dmg;
 
-			if(asteroid.GetComponent <Done_DestroyByContact>().health <= 0)
+			if(asteroid.GetComponent <Done_DestroyByContact>().enemyHealth <= 0)
 			{
 				Instantiate(explosion, other.transform.position, other.transform.rotation);
 				Destroy(other.gameObject);
@@ -98,11 +99,11 @@ public class Done_DestroyByContact : MonoBehaviour
 
 			dmg = bolt.GetComponent <damage>().dmg;
 
-			other.GetComponent <Done_DestroyByContact>().health -= dmg/2;
+			other.GetComponent <Done_DestroyByContact>().enemyHealth -= dmg/2;
 
 			Instantiate (boltExplosion, transform.position, transform.rotation);
 			Destroy (gameObject);
-			if(other.GetComponent <Done_DestroyByContact>().health <= 0)
+			if(other.GetComponent <Done_DestroyByContact>().enemyHealth <= 0)
 			{
 				Instantiate(explosion, other.transform.position, other.transform.rotation);
 				Destroy(other.gameObject);
@@ -125,11 +126,11 @@ public class Done_DestroyByContact : MonoBehaviour
 
 			dmg = this.GetComponent <damage>().dmg;
 
-			other.GetComponent <Done_DestroyByContact>().health -= dmg/2;
+			other.GetComponent <Done_DestroyByContact>().enemyHealth -= dmg/2;
 			
 			Instantiate (boltExplosion, transform.position, transform.rotation);
 			Destroy (gameObject);
-			if(other.GetComponent <Done_DestroyByContact>().health <= 0)
+			if(other.GetComponent <Done_DestroyByContact>().enemyHealth <= 0)
 			{
 				Instantiate(explosion, other.transform.position, other.transform.rotation);
 				Destroy(other.gameObject);
@@ -146,8 +147,8 @@ public class Done_DestroyByContact : MonoBehaviour
 			Destroy (other.gameObject);
 			GameObject bolt = GameObject.FindGameObjectWithTag ("Bolt");
 			dmg = bolt.GetComponent <damage>().dmg;
-			health -= dmg;
-			if(health <= 0)
+			enemyHealth -= dmg;
+			if(enemyHealth <= 0)
 			{
 				Instantiate (explosion, transform.position, transform.rotation);
 				Destroy (gameObject);
@@ -162,8 +163,8 @@ public class Done_DestroyByContact : MonoBehaviour
 			Destroy (other.gameObject);
 			GameObject bolt = GameObject.FindGameObjectWithTag ("Bolt");
 			dmg = bolt.GetComponent <damage>().dmg;
-			health -= dmg;
-			if (health <= 0) 
+			enemyHealth -= dmg;
+			if (enemyHealth <= 0) 
 			{
 				Instantiate (explosion, transform.position, transform.rotation);
 				Destroy (gameObject);
@@ -179,8 +180,8 @@ public class Done_DestroyByContact : MonoBehaviour
 		if ((tag == "Enemy" || tag == "Asteroid") && other.tag == "Player")
 		{
 			Instantiate (boltExplosion, transform.position, transform.rotation);
-			health -= 1;
-			if(health <= 0)
+			enemyHealth -= 1;
+			if(enemyHealth <= 0)
 			{
 				Instantiate (explosion, transform.position, transform.rotation);
 				gameController.AddScore (scoreValue);
@@ -189,7 +190,8 @@ public class Done_DestroyByContact : MonoBehaviour
 			
 			GameObject player = GameObject.FindGameObjectWithTag ("Player");
 			player.GetComponent <Done_PlayerController>().playerHealth--;
-			
+			gameController.UpdateHealth();
+
 			if(player.GetComponent <Done_PlayerController>().playerHealth <= 0)
 			{
 				Instantiate(playerExplosion, other.transform.position, other.transform.rotation);
@@ -202,11 +204,12 @@ public class Done_DestroyByContact : MonoBehaviour
 		if (tag == "Boss" && other.tag == "Player")
 		{
 			Instantiate (explosion, transform.position, transform.rotation);
-			health -= 1;
+			enemyHealth -= 1;
 
 			GameObject player = GameObject.FindGameObjectWithTag ("Player");
 			player.GetComponent <Done_PlayerController>().playerHealth--;
-			
+			gameController.UpdateHealth();
+
 			if(player.GetComponent <Done_PlayerController>().playerHealth <= 0)
 			{
 				Instantiate(playerExplosion, other.transform.position, other.transform.rotation);
@@ -214,7 +217,7 @@ public class Done_DestroyByContact : MonoBehaviour
 				Destroy(other.gameObject);
 			}
 
-			if(health <= 0)
+			if(enemyHealth <= 0)
 			{
 				Instantiate (explosion, transform.position, transform.rotation);
 				gameController.AddScore (scoreValue);

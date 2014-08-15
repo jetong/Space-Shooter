@@ -11,10 +11,21 @@ public class Done_WeaponController : MonoBehaviour
 
 	public GameObject shotRef1;
 	public GameObject shotRef2;
+	Done_GameController gameController;
 
 	void Start ()
 	{
+		gameController = GameObject.FindGameObjectWithTag ("GameController").GetComponent<Done_GameController> ();
 		InvokeRepeating ("Fire", delay, fireRate);
+	}
+
+	void Update()
+	{
+		// if game is over, stop firing
+		if (gameController.gameOver)
+		{
+			CancelInvoke("Fire");
+		}
 	}
 
 	void Fire ()
