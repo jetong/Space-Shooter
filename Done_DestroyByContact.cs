@@ -200,7 +200,7 @@ public class Done_DestroyByContact : MonoBehaviour
 			}
 		}
 
-		//Player collides Boss
+		//Player collides with Boss
 		if (tag == "Boss" && other.tag == "Player")
 		{
 			Instantiate (explosion, transform.position, transform.rotation);
@@ -224,8 +224,18 @@ public class Done_DestroyByContact : MonoBehaviour
 				Destroy (gameObject);
 				gameController.levelComplete = true;
 			}
-			
+		}
 
+		if(tag == "Powerup" && other.tag == "Player")
+		{
+			Debug.Log ("got powerup");
+			GameObject player = GameObject.FindGameObjectWithTag ("Player");
+			player.GetComponent <Done_PlayerController>().playerHealth+=3;
+			gameController.UpdateHealth();
+
+			player.GetComponent<Done_PlayerController>().powerup++;
+
+			Destroy (gameObject);
 		}
 	}
 }

@@ -5,6 +5,7 @@ public class Done_GameController : MonoBehaviour
 {
 	public GameObject boss;
 	public GameObject[] hazards;
+	public GameObject powerup;
 	public Vector3 spawnValues;
 	public int hazardCount;
 	public float spawnWait;
@@ -19,11 +20,11 @@ public class Done_GameController : MonoBehaviour
 	public GUIText gameOverText;
 	public GUIText nextLevelText;
 	public GUIText healthText;
-
-	//private float health;
+	
 	private int score;
 	private int level;
 	private float timer;
+	private int power;
 	private Done_PlayerController playerController;
 
 	void Start ()
@@ -40,14 +41,13 @@ public class Done_GameController : MonoBehaviour
 		if (Application.loadedLevelName == "Scene1") {
 			level = 1;
 			score = 0;
-			//health = 3;
 		} 
 		else 
 		{
 			level = PlayerPrefs.GetInt ("savedLevel");
 			score = PlayerPrefs.GetInt ("savedScore");
+			playerController.powerup = PlayerPrefs.GetInt("savedPowerup");
 			playerController.playerHealth = PlayerPrefs.GetFloat ("savedHealth");
-			//health = PlayerPrefs.GetFloat ("savedHealth");
 		}
 
 		UpdateScore ();
@@ -67,6 +67,7 @@ public class Done_GameController : MonoBehaviour
 				level++;
 				PlayerPrefs.SetInt ("savedLevel", level);
 				PlayerPrefs.SetFloat ("savedHealth", playerController.playerHealth);
+				PlayerPrefs.SetInt("savedPowerup", playerController.powerup);
 				Application.LoadLevel (level-1);
 			}
 		}
@@ -91,8 +92,18 @@ public class Done_GameController : MonoBehaviour
 			Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
 			Quaternion spawnRotation = Quaternion.identity;
 			Instantiate (hazard, spawnPosition, spawnRotation);
+
+			float rand = Random.value;
+			if (rand > .85)
+			{
+				Vector3 spawnPowerupPosition = new Vector3 (Random.Range (-spawnValues.x, spawnValues.x), spawnValues.y, spawnValues.z);
+				Instantiate (powerup, spawnPowerupPosition, Quaternion.identity);
+			}
+
 			yield return new WaitForSeconds (spawnWait);
 		}
+
+
 		yield return new WaitForSeconds (waveWait);
 
 		Instantiate (boss, new Vector3 (0.0f, spawnValues.y, spawnValues.z), Quaternion.identity);

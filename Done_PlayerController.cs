@@ -15,11 +15,15 @@ public class Done_PlayerController : MonoBehaviour
 	public Done_Boundary boundary;
 
 	public GameObject shot;
-	public Transform shotSpawn;
+	public Transform shotSpawnPrimary;
+	public Transform shotSpawnSecondary1;
+	public Transform shotSpawnSecondary2;
 	public float fireRate;
-	 
+	public int powerup;
+
 	private float nextFire;
 	private Done_GameController gameController;
+
 
 	void Start()
 	{
@@ -39,9 +43,31 @@ public class Done_PlayerController : MonoBehaviour
 		if (Input.GetButton("Fire1") && Time.time > nextFire) 
 		{
 			nextFire = Time.time + fireRate;
-			Instantiate(shot, shotSpawn.position, shotSpawn.rotation);
+
+			switch(powerup)
+			{
+				case 0: FirePrimary();
+						break;
+				case 1: FireSecondary ();
+						break;
+				default: FirePrimary();
+						FireSecondary();
+						break;
+			}
+
 			audio.Play ();
 		}
+	}
+
+	void FirePrimary()
+	{
+		Instantiate(shot, shotSpawnPrimary.position, shotSpawnPrimary.rotation);
+	}
+
+	void FireSecondary()
+	{
+		Instantiate(shot, shotSpawnSecondary1.position, shotSpawnSecondary1.rotation);
+		Instantiate(shot, shotSpawnSecondary2.position, shotSpawnSecondary2.rotation);
 	}
 
 	void FixedUpdate ()
